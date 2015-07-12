@@ -25,31 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         getTotalLesson : function(){
             return model.totalLessons;
         },
-        getStudents : function(){
-            return model.students;
-        },
-        addAttend: function(student, num){
-            if (num < 1 || num > model.totalLessons) {
-                console.log('Wrong class number');
-                return
-            }
-            if !(num in student.attendence) {
-                student.attendence.push(num);
-                student.attendence.sort();
-            }
-        },
-        delAttend: function(student, num){
-            if (num in student.attendence) {
-                var numPos;
-                var len = student.attendence.length;
-                for (var i = 0; i < len; i++) {
-                    if (num === student.attendence[i]) {
-                        numPos = i;
-                    }
-                }
-                student.attendence = student.attendence.slice(0, i).concat(student.attendence.slice(i + 1, len));
-            }
-        }
+
         init : function(){
             view.init();
         }
@@ -72,9 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             missNum.textContent = 'Days missed-col';
             this.headRowElem.appendChild(missNum);
         },
-        createStudentRow: function(student) {
 
-        }
         init: function(){
             //store DOM element for later use
             this.headRowElem = document.getElementById('headRow');
