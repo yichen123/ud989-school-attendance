@@ -31,9 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
         addAttend: function(student, num){
             if (num < 1 || num > model.totalLessons) {
                 console.log('Wrong class number');
-                return
             }
-            if !(num in student.attendence) {
+            else if (!(num in student.attendence)) {
                 student.attendence.push(num);
                 student.attendence.sort();
             }
@@ -49,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 student.attendence = student.attendence.slice(0, i).concat(student.attendence.slice(i + 1, len));
             }
-        }
+        },
         init : function(){
             view.init();
         }
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.headRowElem.appendChild(nameCol);
             for (var i = 0, len = octopus.getTotalLesson(); i < len; i++) {
                 var lesson = document.createElement('th');
-                lesson.textContent = i;
+                lesson.textContent = i + 1;
                 this.headRowElem.appendChild(lesson);
             }
             var missNum = document.createElement('th');
@@ -73,12 +72,35 @@ document.addEventListener('DOMContentLoaded', function() {
             this.headRowElem.appendChild(missNum);
         },
         createStudentRow: function(student) {
-
-        }
+            var studentRow = document.createElement('tr');
+            studentRow.classList.add('student');
+            var studentName = document.createElement('td');
+            studentName.classList.add('name-col');
+            studentName.textContent = student.name;
+            studentRow.appendChild(studentName);
+            for(var i = 0, len = model.totalLessons; i < len; i++) {
+                var boxContainer = document.createElement('td');
+                boxContainer.classList.add('attend-col');
+                var box = document.createElement('input');
+                box.type = 'checkbox';
+                boxContainer.appendChild(box);
+                studentRow.appendChild(boxContainer);
+            }
+            var missDay = document.createElement('td');
+            missDay.classList.add('missed-col');
+            missDay.textContent = 0;
+            studentRow.appendChild(missDay);
+            this.tBodyElem.appendChild(studentRow);
+        },
         init: function(){
             //store DOM element for later use
             this.headRowElem = document.getElementById('headRow');
+            this.tBodyElem = document.getElementById('tableBody');
             view.createHeadRow();
+            var students = octopus.getStudents();
+            for (var i = 0, len = students.length; i < len; i++) {
+                view.createStudentRow(students[i]);
+            }
         }
     }
 octopus.init();
