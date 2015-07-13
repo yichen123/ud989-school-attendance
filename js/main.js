@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var model = {
         students: [{
             name: 'Slappy the Frog',
-            attendence: [1, 2, 3, 6, 8, 11]
+            attendence: Array(1, 2, 3, 6, 8, 11)
         }, {
             name: 'Lilly the Lizard',
             attendence: [1, 3, 4, 6, 7, 11]
@@ -17,46 +17,61 @@ document.addEventListener('DOMContentLoaded', function() {
             name: 'Adam the Anaconda',
             attendence: [1, 5, 8, 11, 12]
         }],
-        totalLessons : 12
+        totalLessons: 12
     };
 
     //octopus
     var octopus = {
-        getTotalLesson : function(){
+        getTotalLesson: function() {
             return model.totalLessons;
         },
-        getStudents : function(){
+        getStudents: function() {
             return model.students;
         },
-        addAttend: function(student, num){
+        ifAttended(attendence, lesson) {
+            for (var i = 0, len = attendence.length; i < len; i++) {
+                if (attendence[i] === lesson) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        getAttend: function() {
+            var attendences = [];
+            for (var i = 0, len = model.students.length; i < len; i++) {
+                attendences.push(model.students[i].attendence);
+            }
+            return attendences;
+        },
+        addAttend: function(student, num) {
             if (num < 1 || num > model.totalLessons) {
                 console.log('Wrong class number');
-            }
-            else if (!(num in student.attendence)) {
-                student.attendence.push(num);
-                student.attendence.sort();
+            } else if (!(octopus.ifAttended(student.attendence, num))) {
+                student.attendence = student.attendence.concat([parseInt(num)]);
             }
         },
-        delAttend: function(student, num){
-            if (num in student.attendence) {
-                var numPos;
+        delAttend: function(student, num) {
+            if (octopus.ifAttended(student.attendence, parseInt(num))) {
+                var numPos = 0;
                 var len = student.attendence.length;
                 for (var i = 0; i < len; i++) {
-                    if (num === student.attendence[i]) {
+                    if (num == student.attendence[i]) {
                         numPos = i;
+                        break;
                     }
                 }
                 student.attendence = student.attendence.slice(0, i).concat(student.attendence.slice(i + 1, len));
             }
         },
-        init : function(){
+        init: function() {
             view.init();
+            view.render();
         }
     }
 
     // view
     var view = {
-        createHeadRow : function(){
+        createHeadRow: function() {
             var nameCol = document.createElement('th');
             nameCol.classList.add('name-col');
             nameCol.textContent = 'Student Name';
@@ -72,30 +87,37 @@ document.addEventListener('DOMContentLoaded', function() {
             this.headRowElem.appendChild(missNum);
         },
 
-        updateCheckBox: function(student, num) {
-
-
+        updateCheckbox: function(box, student) {
+            if (box.checked) {
+                octopus.addAttend(student, box.id);
+            }
+            else {
+                octopus.delAttend(student, box.id);
+            }
+            view.render();
         },
 
         createStudentRow: function(student) {
-            var studentRow = document.createElement('tr');
+            //store data for later use
+            studentRow = document.createElement('tr');
             studentRow.classList.add('student');
-            var studentName = document.createElement('td');
+            studentName = document.createElement('td');
             studentName.classList.add('name-col');
             studentName.textContent = student.name;
             studentRow.appendChild(studentName);
-            console.log(student.attendence);
-
-            for(var i = 0, len1 = octopus.getTotalLesson(); i < len1; i++) {
+            for (var i = 0, len = octopus.getTotalLesson(); i < len; i++) {
                 var boxContainer = document.createElement('td');
                 boxContainer.classList.add('attend-col');
                 var box = document.createElement('input');
                 box.type = 'checkbox';
-                for(var j = 0, len2 = student.attendence.length; j < len2; j++) {
-                    if ((i + 1) === student.attendence[j]) {
-                        box.checked = 'True';
-                    }
+                box.id = i + 1;
+                if (octopus.ifAttended(student.attendence, i + 1)) {
+                    box.click();
                 }
+                box.addEventListener('click', function() {
+                    var realI = parseInt(this.id);
+                    view.updateCheckbox(this, student);
+                });
                 boxContainer.appendChild(box);
                 studentRow.appendChild(boxContainer);
             }
@@ -105,7 +127,17 @@ document.addEventListener('DOMContentLoaded', function() {
             studentRow.appendChild(missDay);
             this.tBodyElem.appendChild(studentRow);
         },
-        init: function(){
+
+        render: function() {
+            var missDays = document.getElementsByClassName('missed-col');
+            var attendences = octopus.getAttend();
+            var totalLesson = octopus.getTotalLesson();
+            for(var i = 0, len = missDays.length - 1; i < len; i++) {
+                missDays[i + 1].textContent = totalLesson - attendences[i].length;
+            }
+        },
+
+        init: function() {
             //store DOM element for later use
             this.headRowElem = document.getElementById('headRow');
             this.tBodyElem = document.getElementById('tableBody');
@@ -116,5 +148,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-octopus.init();
+    octopus.init();
 });
