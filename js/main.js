@@ -71,6 +71,12 @@ document.addEventListener('DOMContentLoaded', function() {
             missNum.textContent = 'Days missed-col';
             this.headRowElem.appendChild(missNum);
         },
+
+        updateCheckBox: function(student, num) {
+
+
+        },
+
         createStudentRow: function(student) {
             var studentRow = document.createElement('tr');
             studentRow.classList.add('student');
@@ -78,11 +84,18 @@ document.addEventListener('DOMContentLoaded', function() {
             studentName.classList.add('name-col');
             studentName.textContent = student.name;
             studentRow.appendChild(studentName);
-            for(var i = 0, len = model.totalLessons; i < len; i++) {
+            console.log(student.attendence);
+
+            for(var i = 0, len1 = octopus.getTotalLesson(); i < len1; i++) {
                 var boxContainer = document.createElement('td');
                 boxContainer.classList.add('attend-col');
                 var box = document.createElement('input');
                 box.type = 'checkbox';
+                for(var j = 0, len2 = student.attendence.length; j < len2; j++) {
+                    if ((i + 1) === student.attendence[j]) {
+                        box.checked = 'True';
+                    }
+                }
                 boxContainer.appendChild(box);
                 studentRow.appendChild(boxContainer);
             }
